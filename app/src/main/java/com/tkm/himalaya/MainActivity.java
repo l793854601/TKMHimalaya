@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.tkm.himalaya.utils.LogUtil;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.category.Category;
@@ -29,15 +30,15 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(CategoryList object) {
                 List<Category> categoryLists = object.getCategories();
                 if (categoryLists != null) {
-                    Log.d(TAG, "onSuccess: " + categoryLists.size());
+                    LogUtil.d(TAG, "onSuccess: " + categoryLists.size());
                 } else {
-                    Log.d(TAG, "onSuccess: 0");
+                    LogUtil.d(TAG, "onSuccess: 0");
                 }
             }
 
             @Override
             public void onError(int code, String message) {
-                Log.d(TAG, "onError: " + code + ", message: " + message);
+                LogUtil.d(TAG, "onError: " + code + ", message: " + message);
             }
         });
     }
