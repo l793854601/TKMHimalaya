@@ -1,45 +1,54 @@
 package com.tkm.himalaya;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
-import android.util.Log;
 
-import com.tkm.himalaya.utils.LogUtil;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
-import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
-import com.ximalaya.ting.android.opensdk.model.category.Category;
-import com.ximalaya.ting.android.opensdk.model.category.CategoryList;
+import com.tkm.himalaya.adapters.MainIndicatorAdapter;
+import com.tkm.himalaya.adapters.MainViewPagerAdapter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.lucode.hackware.magicindicator.MagicIndicator;
+import net.lucode.hackware.magicindicator.ViewPagerHelper;
+import net.lucode.hackware.magicindicator.buildins.commonnavigator.CommonNavigator;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    private MagicIndicator mIndicator;
+
+    private ViewPager mVpContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Map<String, String> map = new HashMap<String, String>();
-        CommonRequest.getCategories(map, new IDataCallBack<CategoryList>() {
-            @Override
-            public void onSuccess(CategoryList object) {
-                List<Category> categoryLists = object.getCategories();
-                if (categoryLists != null) {
-                    LogUtil.d(TAG, "onSuccess: " + categoryLists.size());
-                } else {
-                    LogUtil.d(TAG, "onSuccess: 0");
-                }
-            }
+        initViews();
+    }
 
-            @Override
-            public void onError(int code, String message) {
-                LogUtil.d(TAG, "onError: " + code + ", message: " + message);
-            }
+    private void initViews() {
+        mIndicator = findViewById(R.id.mi);
+        mIndicator.setBackgroundColor(getResources().getColor(R.color.main_color));
+
+        //  设置MagicIndicator适配器
+        MainIndicatorAdapter indicatorAdapter = new MainIndicatorAdapter(this);
+        CommonNavigator navigator = new CommonNavigator(this);
+        navigator.setAdapter(indicatorAdapter);
+
+        MainViewPagerAdapter viewPagerAdapter = new MainViewPagerAdapter(this, getSupportFragmentManager());
+        mVpContent = findViewById(R.id.vp_content);
+        mVpContent.setOffscreenPageLimit(3);
+        mVpContent.setAdapter(viewPagerAdapter);
+
+        //  将MagicIndicator与ViewPager绑定在一起
+        mIndicator.setNavigator(navigator);
+        ViewPagerHelper.bind(mIndicator, mVpContent);
+
+        //  设置设置MagicIndicator点击监听
+        indicatorAdapter.setIndicatorSelectedListener(position -> {
+            mVpContent.setCurrentItem(position);
         });
     }
 }
