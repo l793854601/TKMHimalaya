@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:background="@color/white">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_banner"
+        android:layout_width="68dp"
+        android:layout_height="65dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:scaleType="centerCrop"
+        tools:src="@mipmap/ic_launcher" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_banner"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        tools:text="这是标题这是标题......" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/tv_title"
+        android:layout_alignRight="@id/tv_title"
+        android:layout_below="@id/tv_title"
+        android:layout_marginTop="3dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="#ff848484"
+        android:textSize="12sp"
+        tools:text="这是描述......" />
+
+    <LinearLayout
+        android:id="@+id/ll_play_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_below="@id/tv_info"
+        android:layout_alignLeft="@id/tv_info"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:src="@mipmap/play_info_icon" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_play_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:textColor="#ff848484"
+            android:textSize="9sp"
+            tools:text="1234.5万" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_episode_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@id/ll_play_container"
+        android:layout_marginLeft="30dp"
+        android:layout_alignTop="@id/ll_play_container">
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:src="@mipmap/ic_sound" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_episode_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:textColor="#ff848484"
+            android:textSize="9sp"
+            tools:text="1234.5万" />
+
+    </LinearLayout>
+</RelativeLayout>
