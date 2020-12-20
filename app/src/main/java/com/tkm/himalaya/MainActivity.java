@@ -3,10 +3,13 @@ package com.tkm.himalaya;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.media.Image;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import com.tkm.himalaya.adapters.MainIndicatorAdapter;
 import com.tkm.himalaya.adapters.MainViewPagerAdapter;
+import com.tkm.himalaya.utils.LogUtil;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
 import net.lucode.hackware.magicindicator.ViewPagerHelper;
@@ -19,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private MagicIndicator mIndicator;
 
     private ViewPager mVpContent;
+
+    private ImageView mIvSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         //  设置MagicIndicator适配器
         MainIndicatorAdapter indicatorAdapter = new MainIndicatorAdapter(this);
         CommonNavigator navigator = new CommonNavigator(this);
+        navigator.setAdjustMode(true);
         navigator.setAdapter(indicatorAdapter);
 
         MainViewPagerAdapter viewPagerAdapter = new MainViewPagerAdapter(this, getSupportFragmentManager());
@@ -49,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
         //  设置设置MagicIndicator点击监听
         indicatorAdapter.setIndicatorSelectedListener(position -> {
             mVpContent.setCurrentItem(position);
+        });
+
+        mIvSearch = findViewById(R.id.iv_search);
+        mIvSearch.setOnClickListener(view -> {
+            LogUtil.d(TAG, "onSearchImageViewClicked");
         });
     }
 }

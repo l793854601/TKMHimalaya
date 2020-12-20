@@ -50,6 +50,7 @@ public class MainIndicatorAdapter extends CommonNavigatorAdapter {
         SimplePagerTitleView titleView = new ColorTransitionPagerTitleView(context);
         titleView.setNormalColor(Color.GRAY);
         titleView.setSelectedColor(Color.WHITE);
+        titleView.setTextSize(18);
         titleView.setText(mTitles[index]);
         titleView.setOnClickListener(view -> {
             if (mIndicatorSelectedListener != null) {
