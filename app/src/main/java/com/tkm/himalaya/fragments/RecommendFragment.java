@@ -1,5 +1,6 @@
 package com.tkm.himalaya.fragments;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.tkm.himalaya.adapters.RecommendListAdapter;
 import com.tkm.himalaya.base.BaseFragment;
 import com.tkm.himalaya.utils.Constants;
 import com.tkm.himalaya.utils.LogUtil;
+import com.tkm.himalaya.utils.UIUtil;
 import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
@@ -51,6 +53,16 @@ public class RecommendFragment extends BaseFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         mRv.setLayoutManager(layoutManager);
+        //  设置item上下左右边距
+        mRv.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.top = UIUtil.px2dip(getContext(), 5);
+                outRect.bottom = UIUtil.px2dip(getContext(), 5);
+                outRect.left = UIUtil.px2dip(getContext(), 5);
+                outRect.right = UIUtil.px2dip(getContext(), 5);
+            }
+        });
 
         mAdapter = new RecommendListAdapter();
         mRv.setAdapter(mAdapter);

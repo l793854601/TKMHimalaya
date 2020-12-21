@@ -13,8 +13,6 @@ import com.squareup.picasso.Picasso;
 import com.tkm.himalaya.R;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
