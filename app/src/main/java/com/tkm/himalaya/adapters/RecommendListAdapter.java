@@ -45,6 +45,11 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
         notifyDataSetChanged();
     }
 
+    public void addList(List<Album> albumList) {
+        mList.addAll(albumList);
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView mIvBanner;

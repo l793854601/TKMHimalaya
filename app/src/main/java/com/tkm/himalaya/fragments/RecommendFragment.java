@@ -14,25 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tkm.himalaya.R;
 import com.tkm.himalaya.adapters.RecommendListAdapter;
 import com.tkm.himalaya.base.BaseFragment;
-import com.tkm.himalaya.utils.Constants;
-import com.tkm.himalaya.utils.LogUtil;
+import com.tkm.himalaya.interfaces.IRecommendCallback;
+import com.tkm.himalaya.interfaces.IRecommendPresenter;
+import com.tkm.himalaya.presenters.RecommendListPresenter;
 import com.tkm.himalaya.utils.UIUtil;
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
-import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
-import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 推荐
  */
-public class RecommendFragment extends BaseFragment {
+public class RecommendFragment extends BaseFragment implements IRecommendCallback {
 
-    private static final String TAG = "RecommendFragment";
+    private IRecommendPresenter mPresenter;
 
     private RecommendListAdapter mAdapter;
 
@@ -47,12 +42,16 @@ public class RecommendFragment extends BaseFragment {
     protected View getContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_recommend, container, false);
 
+        //  找到控件
         mRv = contentView.findViewById(R.id.rv);
+        //  优化RecyclerView
         mRv.setHasFixedSize(true);
 
+        //  设置布局管理器
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         mRv.setLayoutManager(layoutManager);
+
         //  设置item上下左右边距
         mRv.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -64,39 +63,33 @@ public class RecommendFragment extends BaseFragment {
             }
         });
 
+        //  设置数据适配器
         mAdapter = new RecommendListAdapter();
         mRv.setAdapter(mAdapter);
 
-        getRecommendData();
+        //  获取Presenter层对象
+        mPresenter = RecommendListPresenter.getInstance();
+        //  将View绑定到Presenter中
+        mPresenter.registerViewCallback(this);
+        //  Presenter获取数据
+        mPresenter.getRecommendList();
+
         return contentView;
     }
 
-    /**
-     * 获取推荐数据
-     */
-    private void getRecommendData() {
-        Map<String, String> params = new HashMap<>();
-        params.put(DTransferConstants.LIKE_COUNT, String.valueOf(Constants.RECOMMEND_COUNT));
-        CommonRequest.getGuessLikeAlbum(params, new IDataCallBack<GussLikeAlbumList>() {
-            @Override
-            public void onSuccess(GussLikeAlbumList gussLikeAlbumList) {
-                LogUtil.d(TAG, "onSuccess: " + gussLikeAlbumList.getAlbumList().size());
-                List<Album> albumList = gussLikeAlbumList.getAlbumList();
-                updateRecommendUI(albumList);
-            }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
 
-            @Override
-            public void onError(int i, String s) {
-                LogUtil.d(TAG, "onError: " + s);
-            }
-        });
+        //  取消Presenter与View的绑定关系，避免内存泄漏（绑定与解绑成对儿出现）
+        if (mPresenter != null) {
+            mPresenter.unregisterViewCallback(this);
+        }
     }
 
-    /**
-     * 更新UI
-     * @param albumList
-     */
-    private void updateRecommendUI(List<Album> albumList) {
-        mAdapter.setList(albumList);
+    @Override
+    public void onRecommendListLoaded(List<Album> result) {
+        //  Presenter回调View刷新UI
+        mAdapter.setList(result);
     }
 }
