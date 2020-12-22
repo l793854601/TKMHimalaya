@@ -4,12 +4,27 @@
     android:layout_height="match_parent"
     android:clickable="true">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:text="内容为空" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_centerInParent="true">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:src="@mipmap/content_empty" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="9dp"
+            android:textColor="@color/black"
+            android:textSize="15dp"
+            android:text="内容为空，请点击屏幕重试" />
+
+    </LinearLayout>
 
 </RelativeLayout>

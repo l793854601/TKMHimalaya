@@ -107,14 +107,14 @@ public abstract class UILoader extends FrameLayout {
     }
 
     private void switchUIByCurrentStatus() {
-        //  加载中
-        mLoadingView.setVisibility(mStatus == UILoaderStatus.LOADING ? VISIBLE : GONE);
         //  成功
         mSuccessView.setVisibility(mStatus == UILoaderStatus.SUCCESS ? VISIBLE : GONE);
         //  网络错误
         mNetworkErrorView.setVisibility(mStatus == UILoaderStatus.NETWORK_ERROR ? VISIBLE : GONE);
         //  数据为空
         mEmptyView.setVisibility(mStatus == UILoaderStatus.EMPTY ? VISIBLE : GONE);
+        //  加载中
+        mLoadingView.setVisibility(mStatus == UILoaderStatus.LOADING ? VISIBLE : GONE);
     }
 
     /**
