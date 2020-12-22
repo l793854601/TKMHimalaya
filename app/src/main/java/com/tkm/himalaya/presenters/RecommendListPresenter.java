@@ -39,6 +39,9 @@ public class RecommendListPresenter implements IRecommendPresenter {
 
     @Override
     public void getRecommendList() {
+        //  通知View层，开始加载数据
+        handleOnLoading();
+
         Map<String, String> params = new HashMap<>();
         params.put(DTransferConstants.LIKE_COUNT, String.valueOf(Constants.RECOMMEND_COUNT));
         CommonRequest.getGuessLikeAlbum(params, new IDataCallBack<GussLikeAlbumList>() {
@@ -47,16 +50,18 @@ public class RecommendListPresenter implements IRecommendPresenter {
                 LogUtil.d(TAG, "onSuccess: " + gussLikeAlbumList.getAlbumList().size());
                 List<Album> albumList = gussLikeAlbumList.getAlbumList();
                 //  通知View层（IRecommendCallback），数据获取完成
-                if (mCallbacks != null && mCallbacks.size() > 0) {
-                    for (IRecommendCallback callback : mCallbacks) {
-                        callback.onRecommendListLoaded(albumList);
-                    }
+                if (albumList != null && albumList.size() > 0) {
+                    handleOnRecommendListLoaded(albumList);
+                } else {
+                    handleOnListEmpty();
                 }
             }
 
             @Override
             public void onError(int i, String s) {
                 LogUtil.d(TAG, "onError: " + s);
+                //  通知View层，网络错误
+                handleOnNetworkError();
             }
         });
     }
@@ -72,6 +77,38 @@ public class RecommendListPresenter implements IRecommendPresenter {
     public void unregisterViewCallback(IRecommendCallback callback) {
         if (mCallbacks.contains(callback)) {
             mCallbacks.remove(callback);
+        }
+    }
+
+    private void handleOnRecommendListLoaded(List<Album> albumList) {
+        if (mCallbacks.size() > 0) {
+            for (IRecommendCallback callback : mCallbacks) {
+                callback.onRecommendListLoaded(albumList);
+            }
+        }
+    }
+
+    private void handleOnListEmpty() {
+        if (mCallbacks.size() > 0) {
+            for (IRecommendCallback callback : mCallbacks) {
+                callback.onListEmpty();
+            }
+        }
+    }
+
+    private void handleOnNetworkError() {
+        if (mCallbacks.size() > 0) {
+            for (IRecommendCallback callback : mCallbacks) {
+                callback.onNetworkError();
+            }
+        }
+    }
+
+    private void handleOnLoading() {
+        if (mCallbacks.size() > 0) {
+            for (IRecommendCallback callback : mCallbacks) {
+                callback.onLoading();
+            }
         }
     }
 }

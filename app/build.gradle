@@ -58,6 +58,10 @@ dependencies {
     //  https://github.com/hackware1993/MagicIndicator
     implementation 'com.github.hackware1993:MagicIndicator:1.7.0'
 
+    //  内存泄漏检测工具（只有调试模式下才添加该依赖）
+    //  https://github.com/square/leakcanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
+
     //  网络图片加载
     //  https://github.com/square/picasso
     implementation 'com.squareup.picasso:picasso:2.71828'

@@ -17,6 +17,8 @@ import com.tkm.himalaya.base.BaseFragment;
 import com.tkm.himalaya.interfaces.IRecommendCallback;
 import com.tkm.himalaya.interfaces.IRecommendPresenter;
 import com.tkm.himalaya.presenters.RecommendListPresenter;
+import com.tkm.himalaya.utils.LogUtil;
+import com.tkm.himalaya.views.UILoader;
 import com.tkm.himalaya.utils.UIUtil;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 
@@ -25,11 +27,15 @@ import java.util.List;
 /**
  * 推荐
  */
-public class RecommendFragment extends BaseFragment implements IRecommendCallback {
+public class RecommendFragment extends BaseFragment implements IRecommendCallback, UILoader.OnRetryClickListener {
+
+    private static final String TAG = "RecommendFragment";
 
     private IRecommendPresenter mPresenter;
 
     private RecommendListAdapter mAdapter;
+
+    private UILoader mUILoader;
 
     private RecyclerView mRv;
 
@@ -40,6 +46,32 @@ public class RecommendFragment extends BaseFragment implements IRecommendCallbac
 
     @Override
     protected View getContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //
+        mUILoader = new UILoader(getContext()) {
+            @Override
+            protected View getSuccessView(ViewGroup container) {
+                return createSuccessView(inflater, container);
+            }
+        };
+
+        mUILoader.setRetryClickListener(this);
+
+        //  获取Presenter层对象
+        mPresenter = RecommendListPresenter.getInstance();
+        //  将View绑定到Presenter中
+        mPresenter.registerViewCallback(this);
+        //  Presenter获取数据
+        mPresenter.getRecommendList();
+
+        //  避免重新加载，如果UILoader已经添加，则移除掉
+        if (mUILoader.getParent() != null && mUILoader.getParent() instanceof ViewGroup) {
+            ((ViewGroup) mUILoader.getParent()).removeView(mUILoader);
+        }
+
+        return mUILoader;
+    }
+
+    private View createSuccessView(LayoutInflater inflater, ViewGroup container) {
         View contentView = inflater.inflate(R.layout.fragment_recommend, container, false);
 
         //  找到控件
@@ -67,13 +99,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendCallbac
         mAdapter = new RecommendListAdapter();
         mRv.setAdapter(mAdapter);
 
-        //  获取Presenter层对象
-        mPresenter = RecommendListPresenter.getInstance();
-        //  将View绑定到Presenter中
-        mPresenter.registerViewCallback(this);
-        //  Presenter获取数据
-        mPresenter.getRecommendList();
-
+        //  返回
         return contentView;
     }
 
@@ -89,7 +115,32 @@ public class RecommendFragment extends BaseFragment implements IRecommendCallbac
 
     @Override
     public void onRecommendListLoaded(List<Album> result) {
+        LogUtil.d(TAG, "onRecommendListLoaded: " + result.size());
         //  Presenter回调View刷新UI
         mAdapter.setList(result);
+        mUILoader.setStatus(UILoader.UILoaderStatus.SUCCESS);
+    }
+
+    @Override
+    public void onNetworkError() {
+        LogUtil.d(TAG, "onNetworkError: ");
+        mUILoader.setStatus(UILoader.UILoaderStatus.NETWORK_ERROR);
+    }
+
+    @Override
+    public void onListEmpty() {
+        LogUtil.d(TAG, "onListEmpty: ");
+        mUILoader.setStatus(UILoader.UILoaderStatus.EMPTY);
+    }
+
+    @Override
+    public void onLoading() {
+        LogUtil.d(TAG, "onLoading: ");
+        mUILoader.setStatus(UILoader.UILoaderStatus.LOADING);
+    }
+
+    @Override
+    public void onRetryClick() {
+        mPresenter.getRecommendList();
     }
 }

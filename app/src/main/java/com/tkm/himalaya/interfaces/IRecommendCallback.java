@@ -15,4 +15,19 @@ public interface IRecommendCallback {
      * @param result
      */
     void onRecommendListLoaded(List<Album> result);
+
+    /**
+     * 网络错误
+     */
+    void onNetworkError();
+
+    /**
+     * 数据为空
+     */
+    void onListEmpty();
+
+    /**
+     * 数据正在加载
+     */
+    void onLoading();
 }
