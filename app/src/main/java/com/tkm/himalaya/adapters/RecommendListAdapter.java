@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 import com.tkm.himalaya.R;
+import com.tkm.himalaya.utils.StringUtil;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 
 import java.util.ArrayList;
@@ -18,7 +19,13 @@ import java.util.List;
 
 public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdapter.ViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(int position, Album album);
+    }
+
     private List<Album> mList = new ArrayList<>();
+
+    private OnItemClickListener mOnItemClickListener;
 
     @NonNull
     @Override
@@ -32,6 +39,13 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Album album = mList.get(position);
         holder.bindHolder(album);
+
+
+        if (mOnItemClickListener != null) {
+            holder.itemView.setOnClickListener(v -> {
+                mOnItemClickListener.onItemClick(position, album);
+            });
+        }
     }
 
     @Override
@@ -48,6 +62,10 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
     public void addList(List<Album> albumList) {
         mList.addAll(albumList);
         notifyDataSetChanged();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -74,7 +92,7 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
         public void bindHolder(Album album) {
             mTvTitle.setText(album.getAlbumTitle());
             mTvInfo.setText(album.getAlbumIntro());
-            mTvPlayCount.setText(album.getPlayCount() + "");
+            mTvPlayCount.setText(StringUtil.formatNumberFriendly(album.getPlayCount()));
             mTvEpisode.setText(album.getIncludeTrackCount() + "集");
 
             Picasso.get()

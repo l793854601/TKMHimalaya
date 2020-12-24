@@ -36,7 +36,7 @@
         android:ellipsize="end"
         android:textSize="18sp"
         android:textColor="@color/black"
-        tools:text="这是标题这是标题......" />
+        tools:text="这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_info"
@@ -63,8 +63,8 @@
         android:layout_marginTop="10dp">
 
         <ImageView
-            android:layout_width="8dp"
-            android:layout_height="8dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:src="@mipmap/play_info_icon" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:textColor="#ff848484"
-            android:textSize="9sp"
+            android:textSize="12sp"
             tools:text="1234.5万" />
 
     </LinearLayout>
@@ -89,8 +89,8 @@
         android:layout_alignTop="@id/ll_play_container">
 
         <ImageView
-            android:layout_width="8dp"
-            android:layout_height="8dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:src="@mipmap/ic_sound" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:textColor="#ff848484"
-            android:textSize="9sp"
+            android:textSize="12sp"
             tools:text="1234.5万" />
 
     </LinearLayout>

@@ -13,4 +13,5 @@
 
     <!--主色调-->
     <color name="main_color">#FA7254</color>
+    <color name="sub_text_color">#979797</color>
 </resources>

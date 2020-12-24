@@ -84,6 +84,8 @@ public abstract class UILoader extends FrameLayout {
         addView(mSuccessView);
         addView(mNetworkErrorView);
         addView(mEmptyView);
+        //  隐藏View（此方法内部会处理）
+        switchUIByCurrentStatus();
     }
 
     /**

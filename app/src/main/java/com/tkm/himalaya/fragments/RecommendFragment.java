@@ -1,5 +1,6 @@
 package com.tkm.himalaya.fragments;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,11 +12,13 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.tkm.himalaya.AlbumDetailActivity;
 import com.tkm.himalaya.R;
 import com.tkm.himalaya.adapters.RecommendListAdapter;
 import com.tkm.himalaya.base.BaseFragment;
 import com.tkm.himalaya.interfaces.IRecommendCallback;
 import com.tkm.himalaya.interfaces.IRecommendPresenter;
+import com.tkm.himalaya.presenters.AlbumDetailPresenter;
 import com.tkm.himalaya.presenters.RecommendListPresenter;
 import com.tkm.himalaya.utils.LogUtil;
 import com.tkm.himalaya.views.UILoader;
@@ -97,6 +100,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendCallbac
 
         //  设置数据适配器
         mAdapter = new RecommendListAdapter();
+        //  设置item点击监听器
+        mAdapter.setOnItemClickListener((position, album) -> {
+            LogUtil.d(TAG, "setOnItemClickListener: " + position + ", title: " + album.getAlbumTitle());
+
+            AlbumDetailPresenter.getInstance().setTargetAlbum(album);
+            Intent intent = new Intent(getActivity(), AlbumDetailActivity.class);
+            startActivity(intent);
+        });
         mRv.setAdapter(mAdapter);
 
         //  返回

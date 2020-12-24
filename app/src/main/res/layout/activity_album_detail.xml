@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AlbumDetailActivity">
+
+    <!--Banner-->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_cover"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:scaleType="centerCrop"
+        tools:background="@color/main_color"/>
+
+    <RelativeLayout
+        android:id="@+id/rl_subscription_container"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/iv_cover"
+        android:background="@color/white">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_subscription"
+            android:layout_width="75dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight= "14dp"
+            android:textColor="@color/white"
+            android:background="@drawable/shape_subscription_bg"
+            android:text="+ 订阅"/>
+
+    </RelativeLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/iv_avatar_container"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_below="@id/iv_cover"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="-40dp"
+        app:cardCornerRadius="7.5dp"
+        app:cardElevation="0dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:background="@mipmap/ic_launcher"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_cover"
+        android:layout_toRightOf="@id/iv_avatar_container"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="-30dp"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            tools:text="这是标题" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/author_icon" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:textSize="12sp"
+                android:textColor="@color/sub_text_color"
+                tools:text="这是作者" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_play_control_container"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_below="@id/rl_subscription_container"
+        android:background="#EBE8E8">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_play_control"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/selector_album_detail_play"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_continue_play"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:textSize="14sp"
+            android:text="继续播放" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="选集"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_arrow"
+            android:layout_width="12dp"
+            android:layout_height="6dp"
+            android:layout_marginRight="18dp"
+            android:background="@mipmap/arrow_icon" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ll_play_control_container"
+        android:layout_marginBottom="0dp"
+        android:background="#fff4f4f4"
+        android:overScrollMode="never" />
+
+</RelativeLayout>
