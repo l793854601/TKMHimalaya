@@ -40,12 +40,12 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
         Album album = mList.get(position);
         holder.bindHolder(album);
 
-
-        if (mOnItemClickListener != null) {
-            holder.itemView.setOnClickListener(v -> {
+        holder.itemView.setOnClickListener(v -> {
+            if (mOnItemClickListener != null) {
                 mOnItemClickListener.onItemClick(position, album);
-            });
-        }
+            }
+        });
+
     }
 
     @Override

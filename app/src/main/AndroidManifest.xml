@@ -18,7 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TKMHimalaya"
         android:usesCleartextTraffic="true">
-        <activity android:name=".AlbumDetailActivity"></activity>
+        <activity android:name=".TrackPlayerActivity"></activity>
+        <activity android:name=".AlbumDetailActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -2,10 +2,10 @@ package com.tkm.himalaya;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -170,6 +170,11 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
         });
 
         mAdapter = new AlbumDetailAdapter();
+        mAdapter.setOnItemClickListener((position, track) -> {
+            LogUtil.d(TAG, "setOnItemClick: " + position + ", track: " + track.getTrackTitle());
+            Intent intent = new Intent(AlbumDetailActivity.this, TrackPlayerActivity.class);
+            startActivity(intent);
+        });
         mRvList.setAdapter(mAdapter);
 
         return view;

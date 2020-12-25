@@ -1,5 +1,6 @@
 package com.tkm.himalaya.adapters;
 
+import android.icu.text.UFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,17 @@ import java.util.List;
 
 public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.ViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(int position, Track track);
+    }
+
     private List<Track> mList = new ArrayList<>();
 
     private SimpleDateFormat mYMDDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private SimpleDateFormat mHSDateFormat = new SimpleDateFormat("hh:ss");
 
+    private OnItemClickListener mOnItemClickListener;
 
     @NonNull
     @Override
@@ -37,6 +43,12 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
     public void onBindViewHolder(@NonNull AlbumDetailAdapter.ViewHolder holder, int position) {
         Track track = mList.get(position);
         holder.bindHolder(track);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (mOnItemClickListener != null) {
+                mOnItemClickListener.onItemClick(position, track);
+            }
+        });
     }
 
     @Override
@@ -48,6 +60,10 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
         mList.clear();
         mList.addAll(tracks);
         notifyDataSetChanged();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
