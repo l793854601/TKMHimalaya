@@ -49,7 +49,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendCallbac
 
     @Override
     protected View getContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //
+        //  创建UILoader
         mUILoader = new UILoader(getContext()) {
             @Override
             protected View getSuccessView(ViewGroup container) {

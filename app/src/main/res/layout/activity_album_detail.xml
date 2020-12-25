@@ -69,6 +69,8 @@
             android:layout_height="match_parent"
             android:textSize="18sp"
             android:textColor="@color/white"
+            android:maxLines="1"
+            android:ellipsize="end"
             tools:text="这是标题" />
 
         <LinearLayout
@@ -90,6 +92,8 @@
                 android:layout_marginLeft="5dp"
                 android:textSize="12sp"
                 android:textColor="@color/sub_text_color"
+                android:maxLines="1"
+                android:ellipsize="end"
                 tools:text="这是作者" />
 
         </LinearLayout>
@@ -137,13 +141,10 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_list"
+    <FrameLayout
+        android:id="@+id/fl_list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/ll_play_control_container"
-        android:layout_marginBottom="0dp"
-        android:background="#fff4f4f4"
-        android:overScrollMode="never" />
+        android:layout_below="@id/ll_play_control_container" />
 
 </RelativeLayout>

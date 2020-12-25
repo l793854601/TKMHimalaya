@@ -1,7 +1,5 @@
 package com.tkm.himalaya.presenters;
 
-import android.util.Log;
-
 import com.tkm.himalaya.interfaces.IAlbumDetailCallback;
 import com.tkm.himalaya.interfaces.IAlbumDetailPresenter;
 import com.tkm.himalaya.utils.Constants;
@@ -10,7 +8,6 @@ import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
-import com.ximalaya.ting.android.opensdk.model.track.CommonTrackList;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.model.track.TrackList;
 
@@ -67,7 +64,7 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
             @Override
             public void onError(int i, String s) {
                 LogUtil.d(TAG, "load track list failed: " + i + ", message: " + s);
-
+                handleOnNetworkError(i, s);
             }
         });
     }
@@ -102,6 +99,14 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
         if (mCallbacks.size() > 0) {
             for (IAlbumDetailCallback callback : mCallbacks) {
                 callback.onTrackListLoaded(tracks);
+            }
+        }
+    }
+
+    private void handleOnNetworkError(int errorCode, String errorMessage) {
+        if (mCallbacks.size() > 0) {
+            for (IAlbumDetailCallback callback : mCallbacks) {
+                callback.onNetworkError(errorCode, errorMessage);
             }
         }
     }

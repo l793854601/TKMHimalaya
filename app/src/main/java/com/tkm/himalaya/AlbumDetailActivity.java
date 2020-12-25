@@ -9,7 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +24,7 @@ import com.tkm.himalaya.presenters.AlbumDetailPresenter;
 import com.tkm.himalaya.utils.ImageBlur;
 import com.tkm.himalaya.utils.LogUtil;
 import com.tkm.himalaya.utils.UIUtil;
+import com.tkm.himalaya.views.UILoader;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 
@@ -35,6 +39,8 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
     private AlbumDetailAdapter mAdapter;
 
     private int mCurrentPage = 1;
+
+    private int mCurrentAlbumId = -1;
 
     /**
      * 大封面
@@ -76,6 +82,16 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
      */
     private RecyclerView mRvList;
 
+    /**
+     * 列表容器
+     */
+    private FrameLayout mFlListContainer;
+
+    /**
+     * 网络加载UI
+     */
+    private UILoader mUILoader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +115,23 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
     }
 
     private void initView() {
+
+        if (mUILoader == null) {
+            mUILoader = new UILoader(this) {
+                @Override
+                protected View getSuccessView(ViewGroup container) {
+                    return createSuccessView(container);
+                }
+            };
+
+            mUILoader.setRetryClickListener(new UILoader.OnRetryClickListener() {
+                @Override
+                public void onRetryClick() {
+                    getAlbumDetail(mCurrentAlbumId);
+                }
+            });
+        }
+
         mIvCover = findViewById(R.id.iv_cover);
         mIvAvatar = findViewById(R.id.iv_avatar);
         mTvTitle = findViewById(R.id.tv_title);
@@ -106,7 +139,22 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
         mTvSubscription = findViewById(R.id.tv_subscription);
         mIvPlayControl = findViewById(R.id.iv_play_control);
         mIvArrow = findViewById(R.id.iv_arrow);
-        mRvList = findViewById(R.id.rv_list);
+        mFlListContainer = findViewById(R.id.fl_list_container);
+
+        mFlListContainer.removeAllViews();
+        mFlListContainer.addView(mUILoader);
+    }
+
+    private void initPresenter() {
+        mAlbumDetailPresenter = AlbumDetailPresenter.getInstance();
+        mAlbumDetailPresenter.registerViewCallback(this);
+    }
+
+    private View createSuccessView(ViewGroup container) {
+        View view = LayoutInflater.from(this)
+                .inflate(R.layout.fragment_album_detail_list, container, false);
+
+        mRvList = view.findViewById(R.id.rv_list);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRvList.setLayoutManager(layoutManager);
@@ -123,20 +171,29 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
 
         mAdapter = new AlbumDetailAdapter();
         mRvList.setAdapter(mAdapter);
+
+        return view;
     }
 
-    private void initPresenter() {
-        mAlbumDetailPresenter = AlbumDetailPresenter.getInstance();
-        mAlbumDetailPresenter.registerViewCallback(this);
+    private void getAlbumDetail(int id) {
+        mUILoader.setStatus(UILoader.UILoaderStatus.LOADING);
+        mAlbumDetailPresenter.getAlbumDetail(id, mCurrentPage);
     }
 
     @Override
     public void onTrackListLoaded(List<Track> tracks) {
-        mAdapter.setData(tracks);
+        if (tracks == null || tracks.size() == 0) {
+            mUILoader.setStatus(UILoader.UILoaderStatus.EMPTY);
+        } else {
+            mAdapter.setData(tracks);
+            mUILoader.setStatus(UILoader.UILoaderStatus.SUCCESS);
+        }
     }
 
     @Override
     public void onAlbumLoaded(Album album) {
+
+        mCurrentAlbumId = (int) album.getId();
 
         if (mIvCover != null) {
             Picasso.get().load(album.getCoverUrlLarge()).into(mIvCover, new Callback() {
@@ -167,6 +224,11 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
         }
 
         //  加载Album详情
-        mAlbumDetailPresenter.getAlbumDetail((int) album.getId(), mCurrentPage);
+        getAlbumDetail((int) album.getId());
+    }
+
+    @Override
+    public void onNetworkError(int errorCode, String errorMessage) {
+        mUILoader.setStatus(UILoader.UILoaderStatus.NETWORK_ERROR);
     }
 }

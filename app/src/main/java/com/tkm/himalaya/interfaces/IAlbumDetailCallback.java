@@ -19,4 +19,9 @@ public interface IAlbumDetailCallback {
      * @param album
      */
     void onAlbumLoaded(Album album);
+
+    /**
+     * 网络加载失败
+     */
+    void onNetworkError(int errorCode, String errorMessage);
 }
