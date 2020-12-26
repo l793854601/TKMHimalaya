@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tkm.himalaya.adapters.TrackPlayerPagerAdapter;
+import com.tkm.himalaya.fragments.PlayListDialogFragment;
 import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.presenters.TrackPlayerPresenter;
 import com.tkm.himalaya.utils.LogUtil;
@@ -206,7 +207,8 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         });
         //  播放列表点击事件
         mIvList.setOnClickListener(v -> {
-
+            PlayListDialogFragment fragment = PlayListDialogFragment.newInstance();
+            fragment.show(getSupportFragmentManager());
         });
     }
 
