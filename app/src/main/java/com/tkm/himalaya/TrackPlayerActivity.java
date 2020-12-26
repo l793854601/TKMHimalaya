@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -63,9 +64,9 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     private SeekBar mSbProgress;
 
     /**
-     * 排序
+     * 播放模式
      */
-    private ImageView mIvOrder;
+    private ImageView mIvPlayMode;
 
     /**
      * 上一曲
@@ -120,7 +121,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         mTvStartTime = findViewById(R.id.tv_start_time);
         mTvEndTime = findViewById(R.id.tv_end_time);
         mSbProgress = findViewById(R.id.sb_progress);
-        mIvOrder = findViewById(R.id.iv_order);
+        mIvPlayMode = findViewById(R.id.iv_play_mode);
         mIvPrevious = findViewById(R.id.iv_previous);
         mIvPlayOrPause = findViewById(R.id.iv_play_or_pause);
         mIvNext = findViewById(R.id.iv_next);
@@ -174,7 +175,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
             resetPlayStatusUI();
             mPlayerPresenter.playNext();
         });
-
+        //  进度条事件
         mSbProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -198,6 +199,15 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
                 mPlayerPresenter.seekTo(mCurrentProgress);
             }
         });
+        //  播放模式点击事件
+        mIvPlayMode.setOnClickListener(v -> {
+            XmPlayListControl.PlayMode nextPlayMode = mPlayerPresenter.getNextPlayMode();
+            mPlayerPresenter.switchPlayMode(nextPlayMode);
+        });
+        //  播放列表点击事件
+        mIvList.setOnClickListener(v -> {
+
+        });
     }
 
     private void resetPlayStatusUI() {
@@ -218,10 +228,12 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
         int total = mPlayerPresenter.getCurrentPlayDuration();
         int progress = mPlayerPresenter.getCurrentPlayProgress();
-        updatePlayProgress(progress, total);
+        updatePlayProgressUI(progress, total);
+
+        updatePlayModeUI(mPlayerPresenter.getCurrentPlayMode(), false);
     }
 
-    private void updatePlayProgress(int progress, int total) {
+    private void updatePlayProgressUI(int progress, int total) {
         //  更新播放进度/总进度
         mSbProgress.setMax(total);
         mSbProgress.setProgress(progress); //  此处progress返回的是毫秒
@@ -234,6 +246,46 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
             //  否则显示分秒
             mTvEndTime.setText(mMSDateFormat.format(total));
             mTvStartTime.setText(mMSDateFormat.format(progress));
+        }
+    }
+
+    private void updatePlayModeUI(XmPlayListControl.PlayMode playMode, boolean showToast) {
+        /*
+           单曲循环：PLAY_MODEL_SINGLE_LOOP,
+           列表播放：PLAY_MODEL_LIST,
+           列表循环：PLAY_MODEL_LIST_LOOP,
+           随机播放：PLAY_MODEL_RANDOM;
+         */
+        int playModeResId = -1;
+        String playModeDesc = null;
+
+        switch (playMode) {
+            case PLAY_MODEL_SINGLE_LOOP:
+                playModeResId = R.mipmap.play_mode_loop_one_normal;
+                playModeDesc = "单曲循环";
+                break;
+            case PLAY_MODEL_LIST:
+                playModeResId = R.mipmap.player_icon_list_normal;
+                playModeDesc = "列表播放";
+                break;
+            case PLAY_MODEL_LIST_LOOP:
+                playModeResId = R.mipmap.play_mode_loop_normal;
+                playModeDesc = "列表循环";
+                break;
+            case PLAY_MODEL_RANDOM:
+                playModeResId = R.mipmap.play_mode_random_normal;
+                playModeDesc = "随机播放";
+                break;
+            default:
+                break;
+        }
+
+        if (playModeResId != -1) {
+            mIvPlayMode.setImageDrawable(getResources().getDrawable(playModeResId));
+        }
+
+        if (!TextUtils.isEmpty(playModeDesc) && showToast) {
+            Toast.makeText(this, playModeDesc, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -275,14 +327,14 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
     @Override
     public void onPlayModeChanged(XmPlayListControl.PlayMode mode) {
-
+        updatePlayModeUI(mode, true);
     }
 
     @Override
     public void onPlayProgressChanged(long progress, long total) {
         //  如果不是用户手动触发的，才会更新进度
         if (!mIsUserTouchProgress) {
-            updatePlayProgress((int) progress, (int) total);
+            updatePlayProgressUI((int) progress, (int) total);
         }
     }
 

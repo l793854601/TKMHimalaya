@@ -11,4 +11,9 @@ public class Constants {
      * 列表请求数量
      */
     public static final int PAGE_SIZE_DEFAULT = 50;
+
+    /**
+     * 播放模式
+     */
+    public static final String PLAY_MODEL = "PLAY_MODEL";
 }

@@ -58,6 +58,18 @@ public interface IPlayerPresenter extends IBasePresenter<IPlayerCallback> {
     void switchPlayMode(XmPlayListControl.PlayMode mode);
 
     /**
+     * 获取当前播放模式
+     * @return
+     */
+    XmPlayListControl.PlayMode getCurrentPlayMode();
+
+    /**
+     * 获取下一个播放模式
+     * @return
+     */
+    XmPlayListControl.PlayMode getNextPlayMode();
+
+    /**
      * 设置播放列表
      * @param list
      */
