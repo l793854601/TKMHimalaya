@@ -73,8 +73,8 @@ public interface IPlayerCallback {
     void onAdFinished();
 
     /**
-     * Track标题更新
-     * @param title
+     * Track更新
+     * @param track
      */
-    void onTrackTitleUpdated(String title);
+    void onTrackUpdated(Track track);
 }

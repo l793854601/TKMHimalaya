@@ -9,8 +9,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tkm.himalaya.adapters.TrackPlayerPagerAdapter;
 import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.presenters.TrackPlayerPresenter;
+import com.tkm.himalaya.utils.LogUtil;
 import com.ximalaya.ting.android.opensdk.model.PlayableModel;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
@@ -30,7 +32,11 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
     private int mCurrentProgress = 0;
 
+    private int mCurrentPage = -1;
+
     private boolean mIsUserTouchProgress = false;
+
+    private TrackPlayerPagerAdapter mPlayerPagerAdapter;
 
     /**
      * 标题
@@ -93,6 +99,8 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         initEvents();
         resetPlayProgressUI();
         startPlay();
+
+        mPlayerPresenter.getPlayList();
     }
 
     @Override
@@ -112,6 +120,30 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         mIvPlayOrPause = findViewById(R.id.iv_play_or_pause);
         mIvNext = findViewById(R.id.iv_next);
         mIvList = findViewById(R.id.iv_list);
+
+        mPlayerPagerAdapter = new TrackPlayerPagerAdapter();
+        mVp.setAdapter(mPlayerPagerAdapter);
+        mVp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                LogUtil.d(TAG, "onPageScrolled: " + position);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                LogUtil.d(TAG, "onPageSelected: " + position);
+                mCurrentPage = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                LogUtil.d(TAG, "onPageScrollStateChanged: " + state);
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    //  停止滑动时，才播放，避免卡顿
+                    mPlayerPresenter.playIndex(mCurrentPage);
+                }
+            }
+        });
     }
 
     private void initEvents() {
@@ -216,7 +248,8 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
     @Override
     public void onTrackListLoaded(List<Track> list) {
-
+        LogUtil.d(TAG, "onTrackListLoaded: " + list);
+        mPlayerPagerAdapter.setList(list);
     }
 
     @Override
@@ -257,7 +290,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     }
 
     @Override
-    public void onTrackTitleUpdated(String title) {
-        mTvTitle.setText(title);
+    public void onTrackUpdated(Track track) {
+        mTvTitle.setText(track.getTrackTitle());
     }
 }

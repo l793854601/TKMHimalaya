@@ -46,6 +46,9 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
     }
 
     public void playOrPause() {
+        //  如果正在播放广告，则不处理播放/暂停事件
+        if (mPlayerManager.isAdPlaying()) return;
+
         if (mPlayerManager.isPlaying()) {
             //  如果正在播放，则暂停
             mPlayerManager.pause();
@@ -73,7 +76,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
 
             if (mCallbacks.size() > 0) {
                 for (IPlayerCallback callback : mCallbacks) {
-                    callback.onTrackTitleUpdated(track.getTrackTitle());
+                    callback.onTrackUpdated(track);
                 }
             }
         }
@@ -126,13 +129,22 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
 
     @Override
     public void getPlayList() {
-
+        List<Track> playList = mPlayerManager.getPlayList();
+        if (mCallbacks.size() > 0) {
+            for (IPlayerCallback callback : mCallbacks) {
+                callback.onTrackListLoaded(playList);
+            }
+        }
     }
 
     @Override
     public void playIndex(int index) {
         if (mPlayerManager.isPlaying()) {
             mPlayerManager.stop();
+        }
+        //  越界判断
+        if (index >= mPlayerManager.getPlayList().size()) {
+            return;
         }
         mPlayerManager.play(index);
     }
@@ -249,7 +261,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
 
             if (mCallbacks.size() > 0) {
                 for (IPlayerCallback callback : mCallbacks) {
-                    callback.onTrackTitleUpdated(track.getTrackTitle());
+                    callback.onTrackUpdated(track);
                 }
             }
         }
