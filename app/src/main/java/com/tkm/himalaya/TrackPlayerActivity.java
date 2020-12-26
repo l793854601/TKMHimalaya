@@ -13,7 +13,6 @@ import com.tkm.himalaya.adapters.TrackPlayerPagerAdapter;
 import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.presenters.TrackPlayerPresenter;
 import com.tkm.himalaya.utils.LogUtil;
-import com.ximalaya.ting.android.opensdk.model.PlayableModel;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
@@ -97,10 +96,16 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
         initViews();
         initEvents();
-        resetPlayProgressUI();
-        startPlay();
+        resetPlayStatusUI();
 
         mPlayerPresenter.getPlayList();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        updatePlayStatusUI();
     }
 
     @Override
@@ -153,7 +158,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
                 Toast.makeText(TrackPlayerActivity.this, "没有上一曲", Toast.LENGTH_SHORT).show();
                 return;
             }
-            resetPlayProgressUI();
+            resetPlayStatusUI();
             mPlayerPresenter.playPrevious();
         });
         //  播放/暂停点击事件
@@ -166,7 +171,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
                 Toast.makeText(TrackPlayerActivity.this, "没有下一曲", Toast.LENGTH_SHORT).show();
                 return;
             }
-            resetPlayProgressUI();
+            resetPlayStatusUI();
             mPlayerPresenter.playNext();
         });
 
@@ -195,11 +200,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         });
     }
 
-    private void startPlay() {
-        mPlayerPresenter.play();
-    }
-
-    private void resetPlayProgressUI() {
+    private void resetPlayStatusUI() {
         mTvTitle.setText("");
         mTvStartTime.setText("00:00");
         mTvEndTime.setText("00:00");
@@ -211,9 +212,25 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         mIvNext.setClickable(true);
     }
 
-    @Override
-    public void onPlayPrepared(PlayableModel track) {
+    private void updatePlayStatusUI() {
+        mIvPlayOrPause.setSelected(mPlayerPresenter.isPlaying());
+        mTvTitle.setText(mPlayerPresenter.getCurrentTrackTitle());
 
+        int total = mPlayerPresenter.getCurrentPlayDuration();
+        int progress = mPlayerPresenter.getCurrentPlayProgress();
+        //  更新播放进度/总进度
+        mSbProgress.setMax(total);
+        mSbProgress.setProgress(progress); //  此处progress返回的是毫秒
+        //  更新播放时长
+        if (total > 60 * 60 * 1000) {
+            //  超过一小时，显示时分秒
+            mTvEndTime.setText(mHMSDateFormat.format(total));
+            mTvStartTime.setText(mHMSDateFormat.format(progress));
+        } else {
+            //  否则显示分秒
+            mTvEndTime.setText(mMSDateFormat.format(total));
+            mTvStartTime.setText(mMSDateFormat.format(progress));
+        }
     }
 
     @Override

@@ -9,11 +9,6 @@ import java.util.List;
 public interface IPlayerCallback {
 
     /**
-     * 播放准备完毕
-     */
-    void onPlayPrepared(PlayableModel track);
-
-    /**
      * 播放开始
      */
     void onPlayStart();

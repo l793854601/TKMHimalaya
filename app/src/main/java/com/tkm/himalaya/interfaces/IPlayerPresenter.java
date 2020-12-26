@@ -79,4 +79,22 @@ public interface IPlayerPresenter extends IBasePresenter<IPlayerCallback> {
      * @param progress
      */
     void seekTo(int progress);
+
+    /**
+     * 获取当前播放内容的标题
+     * @return
+     */
+    String getCurrentTrackTitle();
+
+    /**
+     * 获取当前播放进度
+     * @return
+     */
+    int getCurrentPlayProgress();
+
+    /**
+     * 获取当前播放总进度
+     * @return
+     */
+    int getCurrentPlayDuration();
 }

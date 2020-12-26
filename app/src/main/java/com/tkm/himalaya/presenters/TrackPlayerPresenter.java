@@ -10,6 +10,7 @@ import com.ximalaya.ting.android.opensdk.model.advertis.AdvertisList;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.XmPlayerManager;
 import com.ximalaya.ting.android.opensdk.player.advertis.IXmAdsStatusListener;
+import com.ximalaya.ting.android.opensdk.player.constants.PlayerConstants;
 import com.ximalaya.ting.android.opensdk.player.service.IXmPlayerStatusListener;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayerException;
@@ -155,6 +156,26 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
     }
 
     @Override
+    public String getCurrentTrackTitle() {
+        PlayableModel playableModel = mPlayerManager.getCurrSound();
+        if (playableModel != null && playableModel instanceof Track) {
+            Track track = (Track) playableModel;
+            return track.getTrackTitle();
+        }
+        return "";
+    }
+
+    @Override
+    public int getCurrentPlayProgress() {
+        return mPlayerManager.getPlayCurrPositon();
+    }
+
+    @Override
+    public int getCurrentPlayDuration() {
+        return mPlayerManager.getDuration();
+    }
+
+    @Override
     public void registerViewCallback(IPlayerCallback callback) {
         if (!mCallbacks.contains(callback)) {
             mCallbacks.add(callback);
@@ -245,9 +266,8 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
     @Override
     public void onSoundPrepared() {
         LogUtil.d(TAG, "onSoundPrepared");
-        PlayableModel track = mPlayerManager.getCurrSound();
-        for (IPlayerCallback callback : mCallbacks) {
-            callback.onPlayPrepared(track);
+        if (mPlayerManager.getPlayerStatus() == PlayerConstants.STATE_PREPARED) {
+            mPlayerManager.play();
         }
     }
 
