@@ -1,6 +1,8 @@
 package com.tkm.himalaya.interfaces;
 
-public interface IAlbumDetailPresenter {
+import com.tkm.himalaya.base.IBasePresenter;
+
+public interface IAlbumDetailPresenter extends IBasePresenter<IAlbumDetailCallback> {
 
     /**
      * 下拉刷新
@@ -18,17 +20,4 @@ public interface IAlbumDetailPresenter {
      * @param page
      */
     void getAlbumDetail(int id, int page);
-
-    /**
-     * 绑定View
-     * @param callback
-     */
-    void registerViewCallback(IAlbumDetailCallback callback);
-
-    /**
-     * 解绑View
-     * @param callback
-     */
-    void unregisterViewCallback(IAlbumDetailCallback callback);
-
 }

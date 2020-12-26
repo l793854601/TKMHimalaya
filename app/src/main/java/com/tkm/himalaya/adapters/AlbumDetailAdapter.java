@@ -1,6 +1,5 @@
 package com.tkm.himalaya.adapters;
 
-import android.icu.text.UFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +19,14 @@ import java.util.List;
 public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.ViewHolder> {
 
     public interface OnItemClickListener {
-        void onItemClick(int position, Track track);
+        void onItemClick(int position, Track track, List<Track> tracks);
     }
 
     private List<Track> mList = new ArrayList<>();
 
     private SimpleDateFormat mYMDDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    private SimpleDateFormat mHSDateFormat = new SimpleDateFormat("hh:ss");
+    private SimpleDateFormat mMSDateFormat = new SimpleDateFormat("mm:ss");
 
     private OnItemClickListener mOnItemClickListener;
 
@@ -46,7 +45,7 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
 
         holder.itemView.setOnClickListener(v -> {
             if (mOnItemClickListener != null) {
-                mOnItemClickListener.onItemClick(position, track);
+                mOnItemClickListener.onItemClick(position, track, mList);
             }
         });
     }
@@ -88,7 +87,7 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
             mTvOrder.setText(String.valueOf(track.getOrderNum() + 1));
             mTvTitle.setText(track.getTrackTitle());
             mTvPlayCount.setText(StringUtil.formatNumberFriendly(track.getPlayCount()));
-            mTvDuration.setText(mHSDateFormat.format(track.getDuration()));
+            mTvDuration.setText(mMSDateFormat.format(track.getDuration() * 1000));
             mTvCreateDate.setText(mYMDDateFormat.format(track.getCreatedAt()));
         }
     }

@@ -20,6 +20,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.tkm.himalaya.adapters.AlbumDetailAdapter;
 import com.tkm.himalaya.interfaces.IAlbumDetailCallback;
+import com.tkm.himalaya.presenters.TrackPlayerPresenter;
 import com.tkm.himalaya.presenters.AlbumDetailPresenter;
 import com.tkm.himalaya.utils.ImageBlur;
 import com.tkm.himalaya.utils.LogUtil;
@@ -170,8 +171,11 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
         });
 
         mAdapter = new AlbumDetailAdapter();
-        mAdapter.setOnItemClickListener((position, track) -> {
+        mAdapter.setOnItemClickListener((position, track, trackList) -> {
             LogUtil.d(TAG, "setOnItemClick: " + position + ", track: " + track.getTrackTitle());
+            //  设置播放列表
+            TrackPlayerPresenter.getInstance().setPlayList(trackList, position);
+            //  跳转至播放界面
             Intent intent = new Intent(AlbumDetailActivity.this, TrackPlayerActivity.class);
             startActivity(intent);
         });
