@@ -76,7 +76,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
 
             if (mCallbacks.size() > 0) {
                 for (IPlayerCallback callback : mCallbacks) {
-                    callback.onTrackUpdated(track);
+                    callback.onTrackUpdated(track, mPlayerManager.getCurrentIndex());
                 }
             }
         }
@@ -261,7 +261,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
 
             if (mCallbacks.size() > 0) {
                 for (IPlayerCallback callback : mCallbacks) {
-                    callback.onTrackUpdated(track);
+                    callback.onTrackUpdated(track, mPlayerManager.getCurrentIndex());
                 }
             }
         }

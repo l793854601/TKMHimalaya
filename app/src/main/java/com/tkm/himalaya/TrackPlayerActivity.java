@@ -290,7 +290,12 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     }
 
     @Override
-    public void onTrackUpdated(Track track) {
+    public void onTrackUpdated(Track track, int index) {
         mTvTitle.setText(track.getTrackTitle());
+
+        if (index != mCurrentPage) {
+            mVp.setCurrentItem(index, false);
+            mCurrentPage = index;
+        }
     }
 }

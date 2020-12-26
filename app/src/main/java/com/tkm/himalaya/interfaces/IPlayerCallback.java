@@ -75,6 +75,7 @@ public interface IPlayerCallback {
     /**
      * Track更新
      * @param track
+     * @param index
      */
-    void onTrackUpdated(Track track);
+    void onTrackUpdated(Track track, int index);
 }
