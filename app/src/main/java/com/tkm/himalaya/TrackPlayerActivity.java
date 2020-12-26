@@ -218,6 +218,10 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
         int total = mPlayerPresenter.getCurrentPlayDuration();
         int progress = mPlayerPresenter.getCurrentPlayProgress();
+        updatePlayProgress(progress, total);
+    }
+
+    private void updatePlayProgress(int progress, int total) {
         //  更新播放进度/总进度
         mSbProgress.setMax(total);
         mSbProgress.setProgress(progress); //  此处progress返回的是毫秒
@@ -278,22 +282,8 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     public void onPlayProgressChanged(long progress, long total) {
         //  如果不是用户手动触发的，才会更新进度
         if (!mIsUserTouchProgress) {
-            //  更新播放进度/总进度
-            mSbProgress.setMax((int) total);
-            mSbProgress.setProgress((int) progress); //  此处progress返回的是毫秒
-            //  更新播放时长
-            if (total > 60 * 60 * 1000) {
-                //  超过一小时，显示时分秒
-                mTvEndTime.setText(mHMSDateFormat.format(total));
-                mTvStartTime.setText(mHMSDateFormat.format(progress));
-            } else {
-                //  否则显示分秒
-                mTvEndTime.setText(mMSDateFormat.format(total));
-                mTvStartTime.setText(mMSDateFormat.format(progress));
-            }
+            updatePlayProgress((int) progress, (int) total);
         }
-
-
     }
 
     @Override
