@@ -81,6 +81,18 @@ public interface IPlayerPresenter extends IBasePresenter<IPlayerCallback> {
     void getPlayList();
 
     /**
+     * 获取当前播放列表
+     * @return
+     */
+    List<Track> getCurrentPlayList();
+
+    /**
+     * 获取当前播放列表中正在播放的内容的索引
+     * @return
+     */
+    int getPlayingIndexInCurrentPlayList();
+
+    /**
      * 根据索引播放
      * @param index
      */

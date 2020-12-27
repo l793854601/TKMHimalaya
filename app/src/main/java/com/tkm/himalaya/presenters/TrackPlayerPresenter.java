@@ -8,6 +8,7 @@ import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.interfaces.IPlayerPresenter;
 import com.tkm.himalaya.utils.Constants;
 import com.tkm.himalaya.utils.LogUtil;
+import com.tkm.himalaya.utils.PlayUtil;
 import com.ximalaya.ting.android.opensdk.model.PlayableModel;
 import com.ximalaya.ting.android.opensdk.model.advertis.Advertis;
 import com.ximalaya.ting.android.opensdk.model.advertis.AdvertisList;
@@ -71,7 +72,6 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
     public void play() {
         if (!isPlayListSet) return;
         mPlayerManager.play();
-
         //  播放时就回调一次，保证第一次进入播放界面，仍然可以正常获取标题
         PlayableModel playableModel =mPlayerManager.getCurrSound();
         if (playableModel instanceof Track) {
@@ -123,7 +123,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
     @Override
     public void switchPlayMode(XmPlayListControl.PlayMode mode) {
         mPlayerManager.setPlayMode(mode);
-        savePlayModeLocal(mode);
+        PlayUtil.savePlayModeLocal(mode);
         if (mCallbacks.size() > 0) {
             for (IPlayerCallback callback : mCallbacks) {
                 callback.onPlayModeChanged(mode);
@@ -145,17 +145,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
            随机播放：PLAY_MODEL_RANDOM;
          */
         XmPlayListControl.PlayMode currentMode = mPlayerManager.getPlayMode();
-        if (currentMode == XmPlayListControl.PlayMode.PLAY_MODEL_LIST) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_LIST_LOOP;
-        } else if (currentMode == XmPlayListControl.PlayMode.PLAY_MODEL_LIST_LOOP) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_RANDOM;
-        } else if (currentMode == XmPlayListControl.PlayMode.PLAY_MODEL_RANDOM) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP;
-        } else if (currentMode == XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
-        }
-        //  默认返回PLAY_MODEL_LIST
-        return XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+        return PlayUtil.getNextPlayMode(currentMode);
     }
 
     @Override
@@ -175,10 +165,27 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
     }
 
     @Override
+    public List<Track> getCurrentPlayList() {
+        List<Track> result = new ArrayList<>();
+        result.addAll(mPlayerManager.getPlayList());
+        return result;
+    }
+
+    @Override
+    public int getPlayingIndexInCurrentPlayList() {
+        return mPlayerManager.getCurrentIndex();
+    }
+
+    @Override
     public void playIndex(int index) {
         if (mPlayerManager.isPlaying()) {
             mPlayerManager.stop();
         }
+        //  如果当前播放的就是这个内容，则不做任何操作
+        if (mPlayerManager.getCurrentIndex() == index) {
+            return;
+        }
+
         //  越界判断
         if (index >= mPlayerManager.getPlayList().size()) {
             return;
@@ -304,7 +311,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
         LogUtil.d(TAG, "onSoundPrepared");
         if (mPlayerManager.getPlayerStatus() == PlayerConstants.STATE_PREPARED) {
             //  手动设置播放模式
-            switchPlayMode(getLocalPlayMode());
+            switchPlayMode(PlayUtil.getLocalPlayMode());
             mPlayerManager.play();
         }
     }
@@ -356,43 +363,4 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
         return false;
     }
     //********************************IXmPlayerStatusListener播放器状态相关回调 end**********************************
-
-    private void savePlayModeLocal(XmPlayListControl.PlayMode playMode) {
-        SharedPreferences.Editor editor = BaseApplication.
-                getAppContext().
-                getSharedPreferences(Constants.PLAY_MODEL, Context.MODE_MULTI_PROCESS).
-                edit();
-        editor.putString(Constants.PLAY_MODEL, playMode.name());
-        editor.commit();
-    }
-
-    private XmPlayListControl.PlayMode getLocalPlayMode() {
-        SharedPreferences sp =  BaseApplication.
-                getAppContext().
-                getSharedPreferences(Constants.PLAY_MODEL, Context.MODE_MULTI_PROCESS);
-        String playModeString = sp.getString(Constants.PLAY_MODEL, "PLAY_MODEL_LIST");
-        /*
-           单曲循环：PLAY_MODEL_SINGLE_LOOP,
-           列表播放：PLAY_MODEL_LIST,
-           列表循环：PLAY_MODEL_LIST_LOOP,
-           随机播放：PLAY_MODEL_RANDOM;
-         */
-        if (playModeString.equals("PLAY_MODEL_SINGLE_LOOP")) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP;
-        }
-        if (playModeString.equals("PLAY_MODEL_LIST")) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
-        }
-        if (playModeString.equals("PLAY_MODEL_SINGLE_LOOP")) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP;
-        }
-        if (playModeString.equals("PLAY_MODEL_LIST_LOOP")) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP;
-        }
-        if (playModeString.equals("PLAY_MODEL_RANDOM")) {
-            return XmPlayListControl.PlayMode.PLAY_MODEL_RANDOM;
-        }
-        //  默认返回PLAY_MODEL_LIST
-        return XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
-    }
 }

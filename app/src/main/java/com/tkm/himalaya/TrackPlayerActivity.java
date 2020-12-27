@@ -3,18 +3,24 @@ package com.tkm.himalaya;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tkm.himalaya.adapters.TrackPlayerPagerAdapter;
-import com.tkm.himalaya.fragments.PlayListDialogFragment;
 import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.presenters.TrackPlayerPresenter;
 import com.tkm.himalaya.utils.LogUtil;
+import com.tkm.himalaya.utils.PlayUtil;
+import com.tkm.himalaya.views.PlayListPopupWindow;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
@@ -38,6 +44,11 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     private boolean mIsUserTouchProgress = false;
 
     private TrackPlayerPagerAdapter mPlayerPagerAdapter;
+
+    private ValueAnimator mWindowPopInAnimator;
+
+    private ValueAnimator mWindowPopOutAnimator;
+
 
     /**
      * 标题
@@ -89,6 +100,8 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
      */
     private ImageView mIvList;
 
+    private PlayListPopupWindow mPlayListPopupWindow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +111,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
         initViews();
         initEvents();
+        initAnimators();
         resetPlayStatusUI();
 
         mPlayerPresenter.getPlayList();
@@ -114,6 +128,16 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     protected void onDestroy() {
         super.onDestroy();
         mPlayerPresenter.unregisterViewCallback(this);
+
+        //  如果此时Window正在显示，则手动关闭，防止内存泄露
+        dismissPopupWindow();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!dismissPopupWindow()) {
+            super.onBackPressed();
+        }
     }
 
     private void initViews() {
@@ -127,6 +151,8 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         mIvPlayOrPause = findViewById(R.id.iv_play_or_pause);
         mIvNext = findViewById(R.id.iv_next);
         mIvList = findViewById(R.id.iv_list);
+
+        mPlayListPopupWindow = new PlayListPopupWindow();
 
         mPlayerPagerAdapter = new TrackPlayerPagerAdapter();
         mVp.setAdapter(mPlayerPagerAdapter);
@@ -204,12 +230,77 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         mIvPlayMode.setOnClickListener(v -> {
             XmPlayListControl.PlayMode nextPlayMode = mPlayerPresenter.getNextPlayMode();
             mPlayerPresenter.switchPlayMode(nextPlayMode);
+            showPlayModeToast(nextPlayMode);
         });
         //  播放列表点击事件
         mIvList.setOnClickListener(v -> {
-            PlayListDialogFragment fragment = PlayListDialogFragment.newInstance();
-            fragment.show(getSupportFragmentManager());
+            //  TODO: 先用PopupWindow实现，日后改为BottomSheetFragment实现
+            showPopupWindow(v);
         });
+
+        //  PopupWindow消失监听
+        mPlayListPopupWindow.setOnDismissListener(() -> {
+            LogUtil.d(TAG, "window dismiss");
+            //  恢复Window的alpha
+            mWindowPopOutAnimator.start();
+        });
+
+        //  PopupWindow内部交互事件
+        mPlayListPopupWindow.setPlayListActionListener(new PlayListPopupWindow.PlayListActionListener() {
+            @Override
+            public void onChangeNextPlayMode() {
+                XmPlayListControl.PlayMode nextPlayMode = mPlayerPresenter.getNextPlayMode();
+                mPlayerPresenter.switchPlayMode(nextPlayMode);
+            }
+
+            @Override
+            public void onChangePlayIndex(int playIndex) {
+                mPlayerPresenter.playIndex(playIndex);
+            }
+        });
+    }
+
+    private void initAnimators() {
+        mWindowPopInAnimator = ValueAnimator.ofFloat(1, 0.8f);
+        mWindowPopInAnimator.addUpdateListener(animator -> {
+            float alpha = (float) animator.getAnimatedValue();
+            updateWindowAlpha(alpha);
+        });
+
+        mWindowPopOutAnimator = ValueAnimator.ofFloat(0.8f, 1);
+        mWindowPopOutAnimator.addUpdateListener(animator -> {
+            float alpha = (float) animator.getAnimatedValue();
+            updateWindowAlpha(alpha);
+        });
+    }
+
+    private boolean dismissPopupWindow() {
+        if (mPlayListPopupWindow.isShowing()) {
+            mPlayListPopupWindow.dismiss();
+            mWindowPopOutAnimator.start();
+            return true;
+        }
+        return false;
+    }
+
+    private void showPopupWindow(View view) {
+        //  设置数据
+        List<Track> playList = mPlayerPresenter.getCurrentPlayList();
+        int playIndex = mPlayerPresenter.getPlayingIndexInCurrentPlayList();
+        mPlayListPopupWindow.setPlayList(playList, playIndex);
+        //  设置循环模式
+        mPlayListPopupWindow.setCurrentPlayMode(mPlayerPresenter.getCurrentPlayMode());
+        //  展示弹框
+        mPlayListPopupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
+        //  修改Window的alpha（动画）
+        mWindowPopInAnimator.start();
+    }
+
+    private void updateWindowAlpha(float alpha) {
+        Window window = getWindow();
+        WindowManager.LayoutParams attributes = window.getAttributes();
+        attributes.alpha = alpha;
+        window.setAttributes(attributes);
     }
 
     private void resetPlayStatusUI() {
@@ -232,7 +323,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         int progress = mPlayerPresenter.getCurrentPlayProgress();
         updatePlayProgressUI(progress, total);
 
-        updatePlayModeUI(mPlayerPresenter.getCurrentPlayMode(), false);
+        updatePlayModeUI(mPlayerPresenter.getCurrentPlayMode());
     }
 
     private void updatePlayProgressUI(int progress, int total) {
@@ -251,42 +342,20 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         }
     }
 
-    private void updatePlayModeUI(XmPlayListControl.PlayMode playMode, boolean showToast) {
-        /*
-           单曲循环：PLAY_MODEL_SINGLE_LOOP,
-           列表播放：PLAY_MODEL_LIST,
-           列表循环：PLAY_MODEL_LIST_LOOP,
-           随机播放：PLAY_MODEL_RANDOM;
-         */
-        int playModeResId = -1;
-        String playModeDesc = null;
-
-        switch (playMode) {
-            case PLAY_MODEL_SINGLE_LOOP:
-                playModeResId = R.mipmap.play_mode_loop_one_normal;
-                playModeDesc = "单曲循环";
-                break;
-            case PLAY_MODEL_LIST:
-                playModeResId = R.mipmap.player_icon_list_normal;
-                playModeDesc = "列表播放";
-                break;
-            case PLAY_MODEL_LIST_LOOP:
-                playModeResId = R.mipmap.play_mode_loop_normal;
-                playModeDesc = "列表循环";
-                break;
-            case PLAY_MODEL_RANDOM:
-                playModeResId = R.mipmap.play_mode_random_normal;
-                playModeDesc = "随机播放";
-                break;
-            default:
-                break;
-        }
-
+    private void updatePlayModeUI(XmPlayListControl.PlayMode playMode) {
+        int playModeResId = PlayUtil.getPlayModeRes(playMode);
         if (playModeResId != -1) {
             mIvPlayMode.setImageDrawable(getResources().getDrawable(playModeResId));
         }
 
-        if (!TextUtils.isEmpty(playModeDesc) && showToast) {
+        if (mPlayListPopupWindow.isShowing()) {
+            mPlayListPopupWindow.setCurrentPlayMode(playMode);
+        }
+    }
+
+    private void showPlayModeToast(XmPlayListControl.PlayMode playMode) {
+        String playModeDesc = PlayUtil.getPlayModeDesc(playMode);
+        if (!TextUtils.isEmpty(playModeDesc)) {
             Toast.makeText(this, playModeDesc, Toast.LENGTH_SHORT).show();
         }
     }
@@ -329,7 +398,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
     @Override
     public void onPlayModeChanged(XmPlayListControl.PlayMode mode) {
-        updatePlayModeUI(mode, true);
+        updatePlayModeUI(mode);
     }
 
     @Override
@@ -357,6 +426,10 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
         if (index != mCurrentPage) {
             mVp.setCurrentItem(index, false);
             mCurrentPage = index;
+        }
+
+        if (mPlayListPopupWindow.isShowing()) {
+            mPlayListPopupWindow.setPlayIndex(index);
         }
     }
 }
