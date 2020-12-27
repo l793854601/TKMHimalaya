@@ -255,6 +255,8 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
 
             @Override
             public void onChangePlayIndex(int playIndex) {
+                //  选中的如果是当前正在播放的内容，则不处理
+                if (playIndex == mPlayerPresenter.getPlayingIndexInCurrentPlayList()) return;
                 mPlayerPresenter.playIndex(playIndex);
             }
         });

@@ -181,10 +181,6 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
         if (mPlayerManager.isPlaying()) {
             mPlayerManager.stop();
         }
-        //  如果当前播放的就是这个内容，则不做任何操作
-        if (mPlayerManager.getCurrentIndex() == index) {
-            return;
-        }
 
         //  越界判断
         if (index >= mPlayerManager.getPlayList().size()) {
