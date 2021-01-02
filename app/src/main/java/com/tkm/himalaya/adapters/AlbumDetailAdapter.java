@@ -65,6 +65,10 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
         mOnItemClickListener = onItemClickListener;
     }
 
+    public List<Track> getTrackList() {
+        return mList;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mTvOrder;

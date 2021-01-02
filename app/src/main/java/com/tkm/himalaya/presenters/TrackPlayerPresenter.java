@@ -1,14 +1,10 @@
 package com.tkm.himalaya.presenters;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import com.tkm.himalaya.base.BaseApplication;
 import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.interfaces.IPlayerPresenter;
-import com.tkm.himalaya.utils.Constants;
 import com.tkm.himalaya.utils.LogUtil;
-import com.tkm.himalaya.utils.PlayUtil;
+import com.tkm.himalaya.utils.PlayModeUtil;
 import com.ximalaya.ting.android.opensdk.model.PlayableModel;
 import com.ximalaya.ting.android.opensdk.model.advertis.Advertis;
 import com.ximalaya.ting.android.opensdk.model.advertis.AdvertisList;
@@ -123,7 +119,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
     @Override
     public void switchPlayMode(XmPlayListControl.PlayMode mode) {
         mPlayerManager.setPlayMode(mode);
-        PlayUtil.savePlayModeLocal(mode);
+        PlayModeUtil.savePlayModeLocal(mode);
         if (mCallbacks.size() > 0) {
             for (IPlayerCallback callback : mCallbacks) {
                 callback.onPlayModeChanged(mode);
@@ -145,7 +141,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
            随机播放：PLAY_MODEL_RANDOM;
          */
         XmPlayListControl.PlayMode currentMode = mPlayerManager.getPlayMode();
-        return PlayUtil.getNextPlayMode(currentMode);
+        return PlayModeUtil.getNextPlayMode(currentMode);
     }
 
     @Override
@@ -307,7 +303,7 @@ public class TrackPlayerPresenter implements IPlayerPresenter, IXmAdsStatusListe
         LogUtil.d(TAG, "onSoundPrepared");
         if (mPlayerManager.getPlayerStatus() == PlayerConstants.STATE_PREPARED) {
             //  手动设置播放模式
-            switchPlayMode(PlayUtil.getLocalPlayMode());
+            switchPlayMode(PlayModeUtil.getLocalPlayMode());
             mPlayerManager.play();
         }
     }

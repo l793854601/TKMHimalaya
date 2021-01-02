@@ -19,7 +19,7 @@ import com.tkm.himalaya.adapters.TrackPlayerPagerAdapter;
 import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.presenters.TrackPlayerPresenter;
 import com.tkm.himalaya.utils.LogUtil;
-import com.tkm.himalaya.utils.PlayUtil;
+import com.tkm.himalaya.utils.PlayModeUtil;
 import com.tkm.himalaya.views.PlayListPopupWindow;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
@@ -345,7 +345,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     }
 
     private void updatePlayModeUI(XmPlayListControl.PlayMode playMode) {
-        int playModeResId = PlayUtil.getPlayModeRes(playMode);
+        int playModeResId = PlayModeUtil.getPlayModeRes(playMode);
         if (playModeResId != -1) {
             mIvPlayMode.setImageDrawable(getResources().getDrawable(playModeResId));
         }
@@ -356,7 +356,7 @@ public class TrackPlayerActivity extends AppCompatActivity implements IPlayerCal
     }
 
     private void showPlayModeToast(XmPlayListControl.PlayMode playMode) {
-        String playModeDesc = PlayUtil.getPlayModeDesc(playMode);
+        String playModeDesc = PlayModeUtil.getPlayModeDesc(playMode);
         if (!TextUtils.isEmpty(playModeDesc)) {
             Toast.makeText(this, playModeDesc, Toast.LENGTH_SHORT).show();
         }

@@ -7,7 +7,7 @@ import com.tkm.himalaya.R;
 import com.tkm.himalaya.base.BaseApplication;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
-public class PlayUtil {
+public class PlayModeUtil {
     public static int getPlayModeRes(XmPlayListControl.PlayMode playMode) {
         /*
            单曲循环：PLAY_MODEL_SINGLE_LOOP,

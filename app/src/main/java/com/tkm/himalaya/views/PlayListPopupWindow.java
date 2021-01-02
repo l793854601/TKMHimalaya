@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tkm.himalaya.R;
 import com.tkm.himalaya.adapters.PlayListAdapter;
 import com.tkm.himalaya.base.BaseApplication;
-import com.tkm.himalaya.utils.PlayUtil;
+import com.tkm.himalaya.utils.PlayModeUtil;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
@@ -128,8 +128,8 @@ public class PlayListPopupWindow extends PopupWindow {
                     BaseApplication
                             .getAppContext()
                             .getResources().
-                            getDrawable(PlayUtil.getPlayModeRes(playMode)));
-            mTvPlayMode.setText(PlayUtil.getPlayModeDesc(playMode));
+                            getDrawable(PlayModeUtil.getPlayModeRes(playMode)));
+            mTvPlayMode.setText(PlayModeUtil.getPlayModeDesc(playMode));
         }
     }
 

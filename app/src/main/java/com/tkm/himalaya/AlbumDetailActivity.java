@@ -20,6 +20,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.tkm.himalaya.adapters.AlbumDetailAdapter;
 import com.tkm.himalaya.interfaces.IAlbumDetailCallback;
+import com.tkm.himalaya.interfaces.IPlayerCallback;
 import com.tkm.himalaya.presenters.TrackPlayerPresenter;
 import com.tkm.himalaya.presenters.AlbumDetailPresenter;
 import com.tkm.himalaya.utils.ImageBlur;
@@ -28,14 +29,17 @@ import com.tkm.himalaya.utils.UIUtil;
 import com.tkm.himalaya.views.UILoader;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
+import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 
 import java.util.List;
 
-public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDetailCallback {
+public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDetailCallback, IPlayerCallback {
 
     private static final String TAG = "AlbumDetailActivity";
 
     private AlbumDetailPresenter mAlbumDetailPresenter;
+
+    private TrackPlayerPresenter mTrackPlayerPresenter;
 
     private AlbumDetailAdapter mAdapter;
 
@@ -74,6 +78,11 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
     private ImageView mIvPlayControl;
 
     /**
+     * 继续播放
+     */
+    private TextView mTvContinuePlay;
+
+    /**
      * 选集
      */
     private ImageView mIvArrow;
@@ -107,11 +116,21 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        refreshPlayStatusUI();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
         if (mAlbumDetailPresenter != null) {
             mAlbumDetailPresenter.unregisterViewCallback(this);
+        }
+
+        if (mTrackPlayerPresenter != null) {
+            mTrackPlayerPresenter.unregisterViewCallback(this);
         }
     }
 
@@ -139,6 +158,7 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
         mTvAuthor = findViewById(R.id.tv_author);
         mTvSubscription = findViewById(R.id.tv_subscription);
         mIvPlayControl = findViewById(R.id.iv_play_control);
+        mTvContinuePlay = findViewById(R.id.tv_continue_play);
         mIvArrow = findViewById(R.id.iv_arrow);
         mFlListContainer = findViewById(R.id.fl_list_container);
 
@@ -149,6 +169,9 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
     private void initPresenter() {
         mAlbumDetailPresenter = AlbumDetailPresenter.getInstance();
         mAlbumDetailPresenter.registerViewCallback(this);
+
+        mTrackPlayerPresenter = TrackPlayerPresenter.getInstance();
+        mTrackPlayerPresenter.registerViewCallback(this);
     }
 
     private View createSuccessView(ViewGroup container) {
@@ -189,6 +212,49 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
         mAlbumDetailPresenter.getAlbumDetail(id, mCurrentPage);
     }
 
+    private void refreshPlayStatusUI() {
+        if (mIvPlayControl == null || mTvContinuePlay == null || mTrackPlayerPresenter == null) {
+            return;
+        }
+        if (mTrackPlayerPresenter.isPlaying()) {
+            mIvPlayControl.setSelected(true);
+            mTvContinuePlay.setText("暂停播放");
+        } else {
+            mIvPlayControl.setSelected(false);
+            mTvContinuePlay.setText("继续播放");
+        }
+    }
+
+    @Override
+    public void onPlayStart() {
+        refreshPlayStatusUI();
+    }
+
+    @Override
+    public void onPlayPause() {
+        refreshPlayStatusUI();
+    }
+
+    @Override
+    public void onPlayStop() {
+        refreshPlayStatusUI();
+    }
+
+    @Override
+    public void onPlayError() {
+        refreshPlayStatusUI();
+    }
+
+    @Override
+    public void onPlayPrevious(Track track) {
+
+    }
+
+    @Override
+    public void onPlayNext(Track track) {
+
+    }
+
     @Override
     public void onTrackListLoaded(List<Track> tracks) {
         if (tracks == null || tracks.size() == 0) {
@@ -197,6 +263,31 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
             mAdapter.setData(tracks);
             mUILoader.setStatus(UILoader.UILoaderStatus.SUCCESS);
         }
+    }
+
+    @Override
+    public void onPlayModeChanged(XmPlayListControl.PlayMode mode) {
+
+    }
+
+    @Override
+    public void onPlayProgressChanged(long progress, long total) {
+
+    }
+
+    @Override
+    public void onAdLoading() {
+
+    }
+
+    @Override
+    public void onAdFinished() {
+
+    }
+
+    @Override
+    public void onTrackUpdated(Track track, int index) {
+
     }
 
     @Override

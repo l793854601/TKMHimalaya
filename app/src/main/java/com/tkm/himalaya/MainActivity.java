@@ -3,7 +3,6 @@ package com.tkm.himalaya;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
-import android.media.Image;
 import android.os.Bundle;
 import android.widget.ImageView;
 
