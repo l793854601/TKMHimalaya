@@ -164,6 +164,37 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
 
         mFlListContainer.removeAllViews();
         mFlListContainer.addView(mUILoader);
+
+        mIvPlayControl.setOnClickListener(v -> {
+            List<Track> currentPlayList = mTrackPlayerPresenter.getCurrentPlayList();
+            List<Track> tracks = mAdapter.getTrackList();
+            if (currentPlayList == null || currentPlayList.size() == 0) {
+                //  之前没有播放过，则从头开始播放
+                if (tracks.size() == 0) {
+                    return;
+                }
+                mTrackPlayerPresenter.setPlayList(tracks, 0);
+                mTrackPlayerPresenter.play();
+            } else {
+                if (currentPlayList.equals(tracks)) {
+                    if (mTrackPlayerPresenter.isPlaying()) {
+                        mTrackPlayerPresenter.pause();
+                    } else {
+                        mTrackPlayerPresenter.play();
+                    }
+                } else {
+                    //  如果之前的播放列表与当前的不一致，则重新播放
+                    if (tracks.size() == 0) {
+                        return;
+                    }
+                    mTrackPlayerPresenter.setPlayList(tracks, 0);
+                    mTrackPlayerPresenter.play();
+                }
+            }
+
+
+
+        });
     }
 
     private void initPresenter() {
@@ -213,16 +244,25 @@ public class AlbumDetailActivity extends AppCompatActivity implements IAlbumDeta
     }
 
     private void refreshPlayStatusUI() {
-        if (mIvPlayControl == null || mTvContinuePlay == null || mTrackPlayerPresenter == null) {
+        if (mIvPlayControl == null || mTvContinuePlay == null) {
             return;
         }
-        if (mTrackPlayerPresenter.isPlaying()) {
-            mIvPlayControl.setSelected(true);
-            mTvContinuePlay.setText("暂停播放");
+
+        List<Track> currentPlayList = mTrackPlayerPresenter.getCurrentPlayList();
+        List<Track> tracks = mAdapter.getTrackList();
+        if (currentPlayList.equals(tracks)) {
+            if (mTrackPlayerPresenter.isPlaying()) {
+                mIvPlayControl.setSelected(true);
+                mTvContinuePlay.setText("暂停播放");
+            } else {
+                mIvPlayControl.setSelected(false);
+                mTvContinuePlay.setText("继续播放");
+            }
         } else {
             mIvPlayControl.setSelected(false);
             mTvContinuePlay.setText("继续播放");
         }
+
     }
 
     @Override
